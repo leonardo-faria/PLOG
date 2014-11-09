@@ -1,13 +1,11 @@
 %TODO create menus and moves' input
 
-
-
 print_scores(P1,P2):-
         print_score(P1),
         nl,
         print_score(P2).
 
-print_score([_,[S,N,_,_]]):-
+print_score([_,[S,N,_,_],_]):-
         write(N),
         write(' has '),
         write(S),
@@ -23,7 +21,7 @@ print_board(B,P1,P2,L):-
         print_scores(P1,P2).
 
 print_matrix([],_,_,_).
-print_matrix([H|T],[[X1,Y1],[_,_,S1,_]],[[X2,Y2],[_,_,S2,_]],L):-
+print_matrix([H|T],[[X1,Y1],[_,_,S1,_],_],[[X2,Y2],[_,_,S2,_],_],L):-
         nl,
         print_line([X1,Y1,S1],[X2,Y2,S2],L),
         write(' |'),
@@ -35,7 +33,7 @@ print_matrix([H|T],[[X1,Y1],[_,_,S1,_]],[[X2,Y2],[_,_,S2,_]],L):-
         nl,
         write(' |'),
         print_bottom(L),
-        print_matrix(T,[[Xn1,Y1],[_,_,S1,_]],[[Xn2,Y2],[_,_,S2,_]],L).
+        print_matrix(T,[[Xn1,Y1],[_,_,S1,_],_],[[Xn2,Y2],[_,_,S2,_],_],L).
 
 print_row([]).
 print_row([H|T]):-
@@ -72,3 +70,17 @@ print_player(_,[0,0,S]):-
         write(S).
 print_player(_,_):-
         write(' ').
+
+print_start(R,C):-
+        write('Welcome to Stac!\nPlease select board size.\nRows: '),
+        get_code(R1),
+        get_char(_),
+        write('Collumns: '),
+        get_code(C1),
+        get_char(_),
+        R is R1 - 48,
+        C is C1 - 48.
+
+print_invalid:-
+        write('Invalid move!'),
+        nl.

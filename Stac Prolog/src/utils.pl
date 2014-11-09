@@ -18,17 +18,15 @@ get_matrix([_|T],R,C,E):-
         R1 is R-1,
         get_matrix(T,R1,C,E).
         
-/*get(board,column,result)*/
+/*get(list,column,result)*/
 get([H|_],0,H).
 get([_|T],C,E):-
         C1 is C-1,
         get(T,C1,E).
         
-
 /*replace(initial list, column , new element , result).*/
 replace([_|T],0,E,[E|T]).
 replace([H|T],N,E,[H|L]):-
-        N>1,
         N1 is N-1,
         replace(T,N1,E,L).
 
@@ -36,6 +34,5 @@ replace([H|T],N,E,[H|L]):-
 replace_matrix([H|T],0,C,E,[L|T]):-
         replace(H,C,E,L).
 replace_matrix([H|T],R,C,E,[H|L]):-
-        R>1,
         R1 is R-1,
         replace_matrix(T,R1,C,E,L).
