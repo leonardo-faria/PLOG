@@ -1,74 +1,106 @@
 :-[utils],
   [tui],
   [ai].
-
+:-use_module(library(between)).
 %:-initialization(main).
 
-/*player([[x,y],[score,name,symbol,stac],Type])
+/*player([[x,y,moved stac],[score,name,symbol,stac],Type])
 Type 0 -> Player
 Type 1 -> Random Computer
 Type 2 -> Greedy Computer
 */
   
-player1([[0,0],[0,'Player 1','*','$'],1]).
-player2([[X,Y],[0,'Player 2','+','&'],1],X,Y).
-
-main:- print_start(R,C),
+player1([[0,0,0],[0,'Player 1','*','$'],T],T).
+player2([[X,Y,0],[0,'Player 2','+','&'],T],X,Y,T).
+main:-  print_start(R,C,P1T,P2T),
         create_matrix(R,C,1,B),
-        player1(P1),
-        player2(P2,R-1,C-1),
-        move_stac(P1,B,1,1,RP1,B2),
-        print_board(B2,RP1,P2,C).
+        player1(P1,P1T),
+        R1 is R - 1,
+        C1 is C - 1,
+        player2(P2,R1,C1,P2T),
+        play(P1,P2,B,R,C).
 
 /*move_no_stac(+player,+delta x,+delta y,-result)*/
-move_no_stac([[Px,Py],P],X,Y,[[Px+X,Py+Y],P]).
+move_no_stac([[Px,Py,_]|P],X,Y,[[Fx,Fy,0]|P]):-
+        Fx is Px + X,
+        Fy is Py + Y.
 
-/*move_stac(+player,+delta x,+delta y,+board,-result player, -result board)*/
-move_stac([[Px,Py],[S,N,Sy,St],T],B,X,Y,[[Px+X,Py+Y],[S1,N,Sy,St],T],RB):-
+/*move_stac(+player,+board,+delta x,+delta y,-result player, -result board)*/
+move_stac([[Px,Py,_],[S,N,Sy,St],T],B,X,Y,[[Fx,Fy,1],[S1,N,Sy,St],T],RB):-
+        Fx is Px + X,
+        Fy is Py + Y,
         replace_matrix(B,Px,Py,0,B2),
-        get_matrix(B2,Px+X,Py+Y,E),
+        get_matrix(B2,Fx,Fy,E),
         E1 is E + 1,
-        (E1 < 3 -> replace_matrix(B2,Px+X,Py+Y,E1,RB),P is 0;
-         replace_matrix(B2,Px+X,Py+Y,St,RB), P is 1),
+        (E1 < 3 -> replace_matrix(B2, Fx,Fy,E1,RB),P is 0;
+         replace_matrix(B2, Fx,Fy,St,RB), P is 1),
         S1 is S + P.
 
-win([_,[4,_,_,_,_]]).
+win([_,[4,N|_],_]):-
+        nl,nl,
+        write(N),
+        write(' wins!').
 
 /*move(player,board,move[delta x,delta y, stac?],result player,result board)*/
 move(A,B,[X,Y,1],RA,RB):-
-        move_stac(A,X,Y,B,RA,RB).
+        move_stac(A,B,X,Y,RA,RB).
 move(A,B,[X,Y,0],RA,B):-
         move_no_stac(A,X,Y,RA).
 
 /*play(+active player,+oponent,+board,-result player,-result board)*/
-play(A,W,B):-
-        get_move(A,B,M),
-        (validate(A,W,B,M) -> move(A,B,M,RA,RB),
-                              play(W,RA,RB);
-         print_invalid,
-         play(A,W,B)).
+play(A,W,B,R,C):-
+        print_board(B,A,W,C),
+        get_move(A,B,M,R,C),
+        !,
+        (
+           validate(A,W,B,M,R,C),
+           move(A,B,M,RA,RB),
+           (
+              win(A);
+              play(W,RA,RB,R,C)
+           );
+           print_invalid,
+           play(A,W,B,R,C)
+        ).
 
-%TODO ver se sai fora do range
-validate([[Ax,Ay],_],[[Wx,Wy],_],_,[X,Y,0]):-
+
+/*validate(+active player,+oponent,+board,+move)*/
+validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],_,[X,Y,0],R,C):-
+        (X =\= 0;Y =\= 0),
         Fx is Ax + X,
         Fy is Ay + Y,
         Fx >= 0,
         Fy >= 0,
+        Fx < R,
+        Fy < C,
         (Fx =\= Wx;
          Fy =\= Wy).
 
 
-validate([[Ax,Ay],_],[[Wx,Wy],_],_,[X,Y,1]):-
+validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[X,0,1],R,C):-
+        validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],B,[X,0,0],R,C),
+        get_matrix(B,Ax,Ay,1),
         Fx is Ax + X,
-        Fy is Ay + Y,
-        Fx >= 0,
-        Fy >= 0,
-        (Fx =\= Wx;Fy =\=Wy)
-        .
+        (get_matrix(B,Fx,Ay,0);get_matrix(B,Fx,Ay,1)),
+        (Ay == Wy ->
+         (X < 0 -> between(Ax,Fx,Wx),!,false;
+          between(Fx,Ax,Wx),!,false);
+         true).
 
-get_move([_,_,0],_,[X,Y,S]):-
-        read_move(X,Y,S).
-get_move([_,_,1],_,[X,Y,S]):-
-        ai_random_move(X,Y,S).
-get_move(A,B,[X,Y,S]):-
+validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[0,Y,1],R,C):-
+        
+        validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],B,[0,Y,0],R,C),
+        get_matrix(B,Ax,Ay,1),
+        Fy is Ay + Y,
+        (get_matrix(B,Ax,Fy,0);get_matrix(B,Ax,Fy,1);get_matrix(B,Ax,Fy,2)),
+        (Ax == Wx ->
+         (Y < 0 -> between(Ay,Fy,Wy),!,false;
+          between(Fy,Ay,Wy),!,false);
+         true).
+
+get_move([_,[_,N|_],0],_,[X,Y,S],_,_):-
+        read_move(N,X,Y,S).
+get_move([_,_,1],_,[X,Y,S],R,C):-
+        ai_random_move(X,Y,S,R,C).
+get_move(A,B,[X,Y,S],_,_):-
         ai_greedy_move(A,B,X,Y,S).
