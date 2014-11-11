@@ -1,4 +1,3 @@
-%TODO create menus and moves' input
 
 print_scores(P1,P2):-
         print_score(P1),

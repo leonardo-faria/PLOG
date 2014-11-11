@@ -1,4 +1,6 @@
-
+:-[utils],
+  [tui],
+  [ai].
 :-use_module(library(between)).
 %:-initialization(main).
 
@@ -34,7 +36,7 @@ move_stac([[Px,Py,_],[S,N,Sy,St],T],B,X,Y,[[Fx,Fy,1],[S1,N,Sy,St],T],RB):-
          replace_matrix(B2, Fx,Fy,St,RB), P is 1),
         S1 is S + P.
 
-win([_,[3,N|_],_]):-
+win([_,[4,N|_],_]):-
         nl,nl,
         write(N),
         write(' wins!').
@@ -79,27 +81,30 @@ validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[X,0,1],R,C):-
         validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],B,[X,0,0],R,C),
         get_matrix(B,Ax,Ay,1),
         Fx is Ax + X,
-        (get_matrix(B,Fx,Ay,0);get_matrix(B,Fx,Ay,1)),
+        (get_matrix(B,Fx,Ay,0);get_matrix(B,Fx,Ay,1);get_matrix(B,Fx,Ay,2)),
         (Ay == Wy ->
-         (X < 0 -> between(Ax,Fx,Wx),!,false;
-          between(Fx,Ax,Wx),!,false);
+         (
+            X < 0 , between(Ax,Fx,Wx),!,false;
+          between(Fx,Ax,Wx),!,false;
+          true);
          true).
 
 validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[0,Y,1],R,C):-
-        
         validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],B,[0,Y,0],R,C),
         get_matrix(B,Ax,Ay,1),
         Fy is Ay + Y,
         (get_matrix(B,Ax,Fy,0);get_matrix(B,Ax,Fy,1);get_matrix(B,Ax,Fy,2)),
         (Ax == Wx ->
-         (Y < 0 -> between(Ay,Fy,Wy),!,false;
-          between(Fy,Ay,Wy),!,false);
-         true).
+         (Y < 0 ,between(Ay,Fy,Wy), write([Ay,Fy,Wy]),!,false;
+          between(Fy,Ay,Wy), write([Ay,Fy,Wy]),!,false;
+          true
+         );
+         true
+        ).
 
 get_move([_,[_,N|_],0],_,_,[X,Y,S],_,_):-
         read_move(N,X,Y,S).
 get_move([_,_,1],_,_,[X,Y,S],R,C):-
         ai_random_move(X,Y,S,R,C).
 get_move(A,W,B,[X,Y,S],_,_):-
-        ai_greedy_move(A,A,W,B,X,Y,S),nl,
-        get_char(_).
+        ai_greedy_move(A,A,W,B,X,Y,S).

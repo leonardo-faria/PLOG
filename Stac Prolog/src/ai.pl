@@ -1,7 +1,4 @@
-%TODO greedy move generator
-:-[utils],
-  [tui],
-  [game].
+
 :-use_module(library(random)).
 
 ai_random_move(X,0,S,R,_):-
@@ -70,7 +67,6 @@ make_mat(N1,N2,M):-
 get_possible(B,1,F):-
         make_mat_targ(4,4,B,2,1,M1),
         make_mat_targ(4,4,B,1,1,M2),
-        write(M1),
         make_mat(4,4,M3),
         append(M1, M2, M),
         append(M,M3,F).
@@ -85,25 +81,16 @@ treat([[X,Y,S]|T1],Xi,Yi,A,W,B,[[Dx,Dy,S]|T2]):-
         Dy is Y - Yi,
         (Dx = 0;
         Dy = 0),
-        nl,
-        write('\nBefore validate:'),
-        write([Dx,Dy,S]),
         validate(A,W,B,[Dx,Dy,S],5,5),
-        write('\nValidated!\n'),
         treat(T1,Xi,Yi,A,W,B, T2).
 treat([_|T1],Xi,Yi,A,W,B,T2):-
         treat(T1,Xi,Yi,A,W,B, T2).
 
 ai_greedy_move([[Xi,Yi,_]|_],A,W,B,X,Y,S):-
-        write('\nGreedy Moove\n'),
         (
            get_matrix(B,Xi,Yi,1),
            get_possible(B,1,L)
         ;
            get_possible(B,0,L)
         ),
-        write('\n\nResult NOT treated\n'),
-        write(L),
-        treat(L,Xi,Yi,A,W,B,[[X,Y,S]|END]),
-        write('\n\nResult treated\n'),
-        write([[X,Y,S]|END]).
+        treat(L,Xi,Yi,A,W,B,[[X,Y,S]|_]).
