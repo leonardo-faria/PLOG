@@ -115,7 +115,8 @@ read_move(Name,X,Y,S):-
         get_char(C1),
         get_char(_),
         (
-           C1 = 'y',S is 1;
+           C1 = 'y',S is 1
+        ;
            S is 0
         ),
         write('[U]p, [D]own, [L]eft or [R]ight?'),
@@ -126,8 +127,11 @@ read_move(Name,X,Y,S):-
         get_code(_),
         N is C3 - 48,
          (
-           C2 == 'U',X is N * (-1),Y is 0;
-           C2 == 'R',Y is N, X is 0;
-           C2 == 'D',X is N, Y is 0;
+           C2 == 'U',X is N * (-1),Y is 0
+         ;
+           C2 == 'R',Y is N, X is 0
+         ;
+           C2 == 'D',X is N, Y is 0
+         ;
            C2 == 'L',Y is N * (-1), X is 0
         ).

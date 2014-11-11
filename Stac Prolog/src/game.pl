@@ -1,6 +1,4 @@
-:-[utils],
-  [tui],
-  [ai].
+
 :-use_module(library(between)).
 %:-initialization(main).
 
@@ -36,7 +34,7 @@ move_stac([[Px,Py,_],[S,N,Sy,St],T],B,X,Y,[[Fx,Fy,1],[S1,N,Sy,St],T],RB):-
          replace_matrix(B2, Fx,Fy,St,RB), P is 1),
         S1 is S + P.
 
-win([_,[4,N|_],_]):-
+win([_,[3,N|_],_]):-
         nl,nl,
         write(N),
         write(' wins!').
@@ -50,7 +48,7 @@ move(A,B,[X,Y,0],RA,B):-
 /*play(+active player,+oponent,+board,-result player,-result board)*/
 play(A,W,B,R,C):-
         print_board(B,A,W,C),
-        get_move(A,B,M,R,C),
+        get_move(A,W,B,M,R,C),
         !,
         (
            validate(A,W,B,M,R,C),
@@ -98,9 +96,10 @@ validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[0,Y,1],R,C):-
           between(Fy,Ay,Wy),!,false);
          true).
 
-get_move([_,[_,N|_],0],_,[X,Y,S],_,_):-
+get_move([_,[_,N|_],0],_,_,[X,Y,S],_,_):-
         read_move(N,X,Y,S).
-get_move([_,_,1],_,[X,Y,S],R,C):-
+get_move([_,_,1],_,_,[X,Y,S],R,C):-
         ai_random_move(X,Y,S,R,C).
-get_move(A,B,[X,Y,S],_,_):-
-        ai_greedy_move(A,B,X,Y,S).
+get_move(A,W,B,[X,Y,S],_,_):-
+        ai_greedy_move(A,A,W,B,X,Y,S),nl,
+        get_char(_).
