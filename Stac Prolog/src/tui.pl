@@ -1,9 +1,10 @@
-
+/*print_scores(+Player1,+Player2)*/
 print_scores(P1,P2):-
         print_score(P1),
         nl,
         print_score(P2).
 
+/*print_score(+Player1)*/
 print_score([_,[S,N,_,_]|_]):-
         write(N),
         write(' has '),
@@ -11,7 +12,7 @@ print_score([_,[S,N,_,_]|_]):-
         write(' points'),
         nl.
 
-
+/*print_boar(+Board,+Player1,+Player2,+Legth)*/
 print_board(B,P1,P2,L):-
         write('  '),
         print_top(L),
@@ -19,6 +20,7 @@ print_board(B,P1,P2,L):-
         nl,
         print_scores(P1,P2).
 
+/*print_matrix(+Board,+Player1,+Player2,+Legth)*/
 print_matrix([],_,_,_).
 print_matrix([H|T],[[X1,Y1,_],[_,_,S1,_],_],[[X2,Y2,_],[_,_,S2,_],_],L):-
         nl,
@@ -34,12 +36,14 @@ print_matrix([H|T],[[X1,Y1,_],[_,_,S1,_],_],[[X2,Y2,_],[_,_,S2,_],_],L):-
         print_bottom(L),
         print_matrix(T,[[Xn1,Y1,_],[_,_,S1,_],_],[[Xn2,Y2,_],[_,_,S2,_],_],L).
 
+/*print_row(+Row)*/
 print_row([]).
 print_row([H|T]):-
         write(' | '),
         write(H),
         print_row(T).
 
+/*print_top(+N)*/
 print_top(1):-
         write('___').
 print_top(N):-
@@ -47,6 +51,8 @@ print_top(N):-
         write('____'),
         print_top(N1).
 
+
+/*print_bottom(+N)*/
 print_bottom(0).
 print_bottom(N):-
         N1 is N - 1,
@@ -54,6 +60,7 @@ print_bottom(N):-
         print_bottom(N1).
 
 
+/*print_line(+Player1,+Player2,+N)*/
 print_line(_,_,0).
 print_line([X1,Y1,S1],[X2,Y2,S2],N):-
         write(' | '),
@@ -63,6 +70,7 @@ print_line([X1,Y1,S1],[X2,Y2,S2],N):-
         N1 is N - 1,
         print_line([X1,Yn1,S1],[X2,Yn2,S2],N1).
 
+/*print_player(+Player1,+Player2)*/
 print_player([0,0,S],_):-
         write(S).
 print_player(_,[0,0,S]):-
@@ -70,6 +78,7 @@ print_player(_,[0,0,S]):-
 print_player(_,_):-
         write(' ').
 
+/*print_start(-Rows,-Columns,+Player1,+Player2)*/
 print_start(R,C,P1,P2):-
         write('Welcome to Stac!\nPlease select board size.\nRows: '),
         get_code(R1),
@@ -101,11 +110,12 @@ print_start(R,C,P1,P2):-
         ;
            print_start(R,C,P1,P2)
         ).
-
+/*print_invalid*/
 print_invalid:-
         write('Invalid move!'),
         nl.
 
+/*read_move(+Name,-Dx,-Dy,-Move_stac)*/
 read_move(Name,X,Y,S):-
         write('It\'s '),
         write(Name),

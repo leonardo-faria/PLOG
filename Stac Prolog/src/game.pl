@@ -75,8 +75,6 @@ validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],_,[X,Y,0],R,C):-
         Fy < C,
         (Fx =\= Wx;
          Fy =\= Wy).
-
-
 validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[X,0,1],R,C):-
         validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],B,[X,0,0],R,C),
         get_matrix(B,Ax,Ay,1),
@@ -88,7 +86,6 @@ validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[X,0,1],R,C):-
           between(Fx,Ax,Wx),!,false;
           true);
          true).
-
 validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[0,Y,1],R,C):-
         validate([[Ax,Ay,_]|_],[[Wx,Wy,_]|_],B,[0,Y,0],R,C),
         get_matrix(B,Ax,Ay,1),
@@ -101,7 +98,7 @@ validate([[Ax,Ay,0]|_],[[Wx,Wy,_]|_],B,[0,Y,1],R,C):-
          );
          true
         ).
-
+/*get_move(+active player, +waiting player, +board, -move, +rows, +collumns)*/
 get_move([_,[_,N|_],0],_,_,[X,Y,S],_,_):-
         read_move(N,X,Y,S).
 get_move([_,_,1],_,_,[X,Y,S],R,C):-
